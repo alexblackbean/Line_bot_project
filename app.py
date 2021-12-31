@@ -6,40 +6,102 @@ from dotenv import load_dotenv
 from linebot import LineBotApi, WebhookParser, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
-
+import fsm
 from fsm import TocMachine
 from utils import send_text_message
 
 load_dotenv()
+# machine = TocMachine(
+#                 states=["initial","number","one", "not_one"],
+#                 transitions=[
+#                     {
+#                         "trigger": "advance",
+#                         "source": "initial",
+#                         "dest": "number",
+#                         "conditions": "is_test",
+#                         "before": "test"
+#                     },
+#                     {
+#                         "trigger": "advance",
+#                         "source": "number",
+#                         "dest": "one",
+#                         "conditions": "number_check_one",
+#                         "after": "number_reply"   
+#                     },
+#                     {
+#                         "trigger": "advance",
+#                         "source": "number",
+#                         "dest": "not_one",
+#                         "conditions": "number_check_notone",
+#                         "after": "number_reply"   
+#                     },
 
+#                 ],
+#                 initial="initial",
+#                 auto_transitions=False,
+#                 show_conditions=True,
+#             )
+machine = TocMachine(
+                states=["initial","number","one", "not_one","Single","Double","AD"],
+                transitions=[
+                    {
+                        "trigger": "advance",
+                        "source": "initial",
+                        "dest": "number",
+                        "conditions": "is_test",
+                        "before": "test"
+                    },
+                    {
+                        "trigger": "advance",
+                        "source": "number",
+                        "dest": "one",
+                        "conditions": "number_check_one",
+                        "after": "number_reply"   
+                    },
+                    {
+                        "trigger": "advance",
+                        "source": "number",
+                        "dest": "not_one",
+                        "conditions": "number_check_notone",
+                        "after": "number_reply"   
+                    },
+                    {
+                        "trigger": "advance",
+                        "source": ["one","not_one"],
+                        "dest": "Single",
+                        "conditions": "is_Single",
+                        "after": "Single_reply"
+                    },
+                    {
+                        "trigger": "advance",
+                        "source": "Single",
+                        "dest": "AD",
+                        "conditions": "is_AD",
+                        "after": 'AD'
+                    },
+                    # {
+                    #     "trigger": "advance",
+                    #     "source": ["one","not_one"],
+                    #     "dest": "Double",
+                    #     "conditions": "is_Double",
+                    #     "after": 
+                    # },
+
+                ],
+                initial="initial",
+                auto_transitions=False,
+                show_conditions=True,
+            )
 class User():
     def __init__(self):
         self.uid = 0
-        self.machine = None
-# machine = TocMachine(
-#     states=["user", "state1", "state2"],
-#     transitions=[
-#         {
-#             "trigger": "advance",
-#             "source": "user",
-#             "dest": "state1",
-#             "conditions": "is_going_to_state1",
-#         },
-#         {
-#             "trigger": "advance",
-#             "source": "user",
-#             "dest": "state2",
-#             "conditions": "is_going_to_state2",
-#         },
-#         {"trigger": "go_back", "source": ["state1", "state2"], "dest": "user"},
-#     ],
-#     initial="user",
-#     auto_transitions=False,
-#     show_conditions=True,
-# )
+        self.machine = 0
+        self.number = 0
+        self.match = ''
+        self.AD = False
 
 app = Flask(__name__, static_url_path="")
-users = []
+
 first_time = True
 # get channel_secret and channel_access_token from your environment variable
 channel_secret = os.getenv("LINE_CHANNEL_SECRET", None)
@@ -60,7 +122,6 @@ def callback():
     signature = request.headers["X-Line-Signature"]
     # get request body as text
     body = request.get_data(as_text=True)
-    # if 'userid'
     app.logger.info(f"Request body: {body}")
     # parse webhook body
     try:
@@ -74,7 +135,7 @@ def callback():
         user_id = event.source.user_id
         flag = False
         temp = None
-        for item in users:
+        for item in fsm.users:
             if item.uid == user_id:
                 flag = True
                 temp = item.machine
@@ -99,7 +160,7 @@ def handle_message(event):
     found = False
     global first_time
     if not first_time:
-        for item in users:
+        for item in fsm.users:
             if item.uid == user_id:
                 found = True
                 break
@@ -110,27 +171,57 @@ def handle_message(event):
         new_user = User()
         new_user.uid = user_id
         new_user.machine = TocMachine(
-                states=["user", "state1", "state2"],
+                states=["initial","number","one", "not_one","Single","Double","AD"],
                 transitions=[
-                    {  
+                    {
                         "trigger": "advance",
-                        "source": "user",
-                        "dest": "state1",
-                        "conditions": "is_going_to_state1",
+                        "source": "initial",
+                        "dest": "number",
+                        "conditions": "is_test",
+                        "before": "test"
                     },
                     {
                         "trigger": "advance",
-                        "source": "user",
-                        "dest": "state2",
-                        "conditions": "is_going_to_state2",
+                        "source": "number",
+                        "dest": "one",
+                        "conditions": "number_check_one",
+                        "after": "number_reply"   
                     },
-                    {"trigger": "go_back", "source": ["state1", "state2"], "dest": "user"},
+                    {
+                        "trigger": "advance",
+                        "source": "number",
+                        "dest": "not_one",
+                        "conditions": "number_check_notone",
+                        "after": "number_reply"   
+                    },
+                    {
+                        "trigger": "advance",
+                        "source": ["one","not_one"],
+                        "dest": "Single",
+                        "conditions": "is_Single",
+                        "after": "Single_reply"
+                    },
+                    {
+                        "trigger": "advance",
+                        "source": "Single",
+                        "dest": "AD",
+                        "conditions": "is_AD",
+                        "after": 'AD'
+                    },
+                    # {
+                    #     "trigger": "advance",
+                    #     "source": ["one","not_one"],
+                    #     "dest": "Double",
+                    #     "conditions": "is_Double",
+                    #     "after": 
+                    # },
+
                 ],
-                initial="user",
+                initial="initial",
                 auto_transitions=False,
                 show_conditions=True,
             )
-        users.append(new_user)
+        fsm.users.append(new_user)
         # print('user_id = ', user_id)
 
 # @app.route("/webhook", methods=["POST"])
