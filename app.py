@@ -42,56 +42,82 @@ load_dotenv()
 #                 show_conditions=True,
 #             )
 machine = TocMachine(
-                states=["initial","number","one", "not_one","Single","Double","AD"],
-                transitions=[
-                    {
-                        "trigger": "advance",
-                        "source": "initial",
-                        "dest": "number",
-                        "conditions": "is_test",
-                        "before": "test"
-                    },
-                    {
-                        "trigger": "advance",
-                        "source": "number",
-                        "dest": "one",
-                        "conditions": "number_check_one",
-                        "after": "number_reply"   
-                    },
-                    {
-                        "trigger": "advance",
-                        "source": "number",
-                        "dest": "not_one",
-                        "conditions": "number_check_notone",
-                        "after": "number_reply"   
-                    },
-                    {
-                        "trigger": "advance",
-                        "source": ["one","not_one"],
-                        "dest": "Single",
-                        "conditions": "is_Single",
-                        "after": "Single_reply"
-                    },
-                    {
-                        "trigger": "advance",
-                        "source": "Single",
-                        "dest": "AD",
-                        "conditions": "is_AD",
-                        "after": 'AD'
-                    },
-                    # {
-                    #     "trigger": "advance",
-                    #     "source": ["one","not_one"],
-                    #     "dest": "Double",
-                    #     "conditions": "is_Double",
-                    #     "after": 
-                    # },
+            states=["initial","number","one", "not_one","Single","Double","AD","a","b"],
+            transitions=[
+                {
+                    "trigger": "advance",
+                    "source": "initial",
+                    "dest": "number",
+                    "conditions": "is_test",
+                    "before": "test"
+                },
+                {
+                    "trigger": "advance",
+                    "source": "number",
+                    "dest": "one",
+                    "conditions": "number_check_one",
+                    "after": "number_reply"   
+                },
+                {
+                    "trigger": "advance",
+                    "source": "number",
+                    "dest": "not_one",
+                    "conditions": "number_check_notone",
+                    "after": "number_reply"   
+                },
+                {
+                    "trigger": "advance",
+                    "source": ["one","not_one"],
+                    "dest": "Single",
+                    "conditions": "is_Single",
+                    "after": "Single_reply"
+                },
+                {
+                    "trigger": "advance",
+                    "source": ["Single","Double"],
+                    "dest": "AD",
+                    "conditions": "is_AD",
+                    "after": 'AD'
+                },
+                {
+                    "trigger": "advance",
+                    "source": ["one","not_one"],
+                    "dest": "Double",
+                    "conditions": "is_Double",
+                    "after": "Double_reply"
+                },
+                {
+                    "trigger": "advance",
+                    "source": ["Single","Double"],
+                    "dest": "a",
+                    "conditions": "is_a",
+                    "after": "a_reply"
+                },
+                {
+                    "trigger": "advance",
+                    "source": ["Single","Double"],
+                    "dest": "b",
+                    "conditions": "is_b",
+                    "after": "b_reply"
+                },
+                {
+                    "trigger": "go_back",
+                    "source": ["a","b","AD"],
+                    "dest": "Single",
+                    "conditions": "go_back_single",
+                },
+                {
+                    "trigger": "go_back",
+                    "source": ["a","b","AD"],
+                    "dest": "Double",
+                    "conditions": "go_back_double",
+                }
 
-                ],
-                initial="initial",
-                auto_transitions=False,
-                show_conditions=True,
-            )
+            ],
+            initial="initial",
+            auto_transitions=False,
+            show_conditions=True,
+        )
 class User():
     def __init__(self):
         self.uid = 0
@@ -150,6 +176,8 @@ def callback():
         # print(f"REQUEST BODY: \n{body}")
         if flag == True:
             response = temp.advance(event)
+            print(temp.state)
+            # print()
             if response == False:
                 send_text_message(event.reply_token, "Not Entering any State")
 
@@ -171,56 +199,82 @@ def handle_message(event):
         new_user = User()
         new_user.uid = user_id
         new_user.machine = TocMachine(
-                states=["initial","number","one", "not_one","Single","Double","AD"],
-                transitions=[
-                    {
-                        "trigger": "advance",
-                        "source": "initial",
-                        "dest": "number",
-                        "conditions": "is_test",
-                        "before": "test"
-                    },
-                    {
-                        "trigger": "advance",
-                        "source": "number",
-                        "dest": "one",
-                        "conditions": "number_check_one",
-                        "after": "number_reply"   
-                    },
-                    {
-                        "trigger": "advance",
-                        "source": "number",
-                        "dest": "not_one",
-                        "conditions": "number_check_notone",
-                        "after": "number_reply"   
-                    },
-                    {
-                        "trigger": "advance",
-                        "source": ["one","not_one"],
-                        "dest": "Single",
-                        "conditions": "is_Single",
-                        "after": "Single_reply"
-                    },
-                    {
-                        "trigger": "advance",
-                        "source": "Single",
-                        "dest": "AD",
-                        "conditions": "is_AD",
-                        "after": 'AD'
-                    },
-                    # {
-                    #     "trigger": "advance",
-                    #     "source": ["one","not_one"],
-                    #     "dest": "Double",
-                    #     "conditions": "is_Double",
-                    #     "after": 
-                    # },
+            states=["initial","number","one", "not_one","Single","Double","AD","a","b"],
+            transitions=[
+                {
+                    "trigger": "advance",
+                    "source": "initial",
+                    "dest": "number",
+                    "conditions": "is_test",
+                    "before": "test"
+                },
+                {
+                    "trigger": "advance",
+                    "source": "number",
+                    "dest": "one",
+                    "conditions": "number_check_one",
+                    "after": "number_reply"   
+                },
+                {
+                    "trigger": "advance",
+                    "source": "number",
+                    "dest": "not_one",
+                    "conditions": "number_check_notone",
+                    "after": "number_reply"   
+                },
+                {
+                    "trigger": "advance",
+                    "source": ["one","not_one"],
+                    "dest": "Single",
+                    "conditions": "is_Single",
+                    "after": "Single_reply"
+                },
+                {
+                    "trigger": "advance",
+                    "source": ["Single","Double"],
+                    "dest": "AD",
+                    "conditions": "is_AD",
+                    "after": 'AD'
+                },
+                {
+                    "trigger": "advance",
+                    "source": ["one","not_one"],
+                    "dest": "Double",
+                    "conditions": "is_Double",
+                    "after": "Double_reply"
+                },
+                {
+                    "trigger": "advance",
+                    "source": ["Single","Double"],
+                    "dest": "a",
+                    "conditions": "is_a",
+                    "after": "a_reply"
+                },
+                {
+                    "trigger": "advance",
+                    "source": ["Single","Double"],
+                    "dest": "b",
+                    "conditions": "is_b",
+                    "after": "b_reply"
+                },
+                {
+                    "trigger": "go_back",
+                    "source": ["a","b","AD"],
+                    "dest": "Single",
+                    "conditions": "go_back_single",
+                },
+                {
+                    "trigger": "go_back",
+                    "source": ["a","b","AD"],
+                    "dest": "Double",
+                    "conditions": "go_back_double",
+                }
 
-                ],
-                initial="initial",
-                auto_transitions=False,
-                show_conditions=True,
-            )
+            ],
+            initial="initial",
+            auto_transitions=False,
+            show_conditions=True,
+        )
         fsm.users.append(new_user)
         # print('user_id = ', user_id)
 

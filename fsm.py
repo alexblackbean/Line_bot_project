@@ -1,6 +1,8 @@
 from transitions.extensions import GraphMachine
 
 from utils import send_text_message
+req_menu_double = 'Here comes the menu!\n1.小碎步(請輸入\na 獲得詳細資訊)\n2.壓迫性發球(致勝關鍵基本功,請輸入\nb 獲得詳細資訊)\n3.(Optinal)你想不想練擊球甜蜜點手感?(Yes or No)'
+req_menu_single = 'Here comes the menu!\n1.米字步(全場跑腳步的基本功,請輸入\na 獲得詳細資訊)\n2.短球、長球發球(發球基本功,請輸入\nb 獲得詳細資訊)\n3.(Optinal) 你想不想練反手擊球穩定度?(Yes or No)'
 users = []
 value = 0 #object
 class TocMachine(GraphMachine):
@@ -32,14 +34,14 @@ class TocMachine(GraphMachine):
     def number_reply(self,event):
         reply_token = event.reply_token
         uid = event.source.user_id
-        req = 'Hmm...In this case, we suggest you to do some stamaina trainning, but first, Tell us match kind!\n (Single or double?)'
-        req_2 = 'Because you have partners,Please tell us what kind of match do you want to train for (Single or double?)'
+        req = 'OK 看來這次只有你一個人，那就來點體能訓練好了!\n但首先，告訴我你想練單打還是雙打(Single or Double?)'
+        req_2 = 'OK 如果有同伴的話，訓練將更加多元! 你們想練單打還是雙打?(Single or double?)'
         for item in users:
             if uid == item.uid:
                 if item.number == 1:
-                    send_text_message(reply_token,"OK you select one person\n"+req)
+                    send_text_message(reply_token,req)
                 else:
-                    send_text_message(reply_token,"OK you select two or more\n"+req_2)
+                    send_text_message(reply_token,req_2)
                 break
     def is_Single(self,event):
         text = event.message.text
@@ -58,9 +60,28 @@ class TocMachine(GraphMachine):
         for item in users:
             if uid == item.uid:
                 if item.number == 1:
-                    req = 'Here comes the menu!\n1.米字步(全場跑腳步的基本功)\n2.短球、長球發球(發球基本功)\n3.(Optinal) 你想不想練反手擊球穩定度?(Yes or No)'
+                    req = req_menu_single
                     break
-        req_f = ''
+        send_text_message(reply_token,req)
+    def is_Double(self,event):
+        text = event.message.text
+        uid = event.source.user_id
+        if text == "Double":
+            for item in users:
+                if uid == item.uid:
+                    item.match = 'Double'
+                    break
+            return True
+        else:
+            return False
+    def Double_reply(self,event):
+        reply_token = event.reply_token
+        uid = event.source.user_id
+        for item in users:
+            if uid == item.uid:
+                if item.number == 1:
+                    req = req_menu_double
+                    break
         send_text_message(reply_token,req)
     def is_AD(self,event):
         text = event.message.text
@@ -78,12 +99,77 @@ class TocMachine(GraphMachine):
         uid = event.source.user_id
         for item in users:
             if uid == item.uid:
-                if item.number == 1:
+                if item.number == 1 and item.match == 'Single':
                     req = '聽好喔~ 首先將球打高\n接著配合腳步移動對的位置\n最後抓時機打出長球或過渡球'
+                    send_text_message(reply_token,req+req_menu_single)
+                elif item.number == 1 and item.match == "Double":
+                    req = 'send image'
+                    send_text_message(reply_token,req+req_menu_double)
                 break
-        send_text_message(reply_token,req)
+        self.go_back(event)
+    def is_a(self,event):
+        text = event.message.text
+        uid = event.source.user_id
+        if text == "a":
+            return True
+        else:
+            return False
+    def a_reply(self,event):
+        reply_token = event.reply_token
+        uid = event.source.user_id
+        for item in users:
+            if uid == item.uid:
+                if item.number == 1 and item.match == "Single":
+                    req = 'send image of 6 point run'
+                    send_text_message(reply_token,req+req_menu_single)
+                elif item.number == 1 and item.match == "Double":
+                    req = 'send image of small'
+                    send_text_message(reply_token,req+req_menu_double)
+                break
+        
+        self.go_back(event)
+    def is_b(self,event):
+        text = event.message.text
+        uid = event.source.user_id
+        if text == "b":
+            return True
+        else:
+            return False
+    def b_reply(self,event):
+        reply_token = event.reply_token
+        uid = event.source.user_id
+        for item in users:
+            if uid == item.uid:
+                if item.number == 1 and item.match == "Single":
+                    req = 'send image of basic serve'
+                    send_text_message(reply_token,req+req_menu_single)
+                    break
+                elif item.number == 1 and item.match == "Double":
+                    req = 'send image of ad serve'
+                    send_text_message(reply_token,req+req_menu_double)
+                    break
+        
+        self.go_back(event)
     def is_test(self,event):
         return True
     def test(self,event):
         reply_token = event.reply_token
-        send_text_message(reply_token, "Welcome to badminton trainning planner!\nPlease Enter the number of trainers!")
+        send_text_message(reply_token, "歡迎使用羽球訓練菜單輔助機器人!\n請輸入總共有幾人要進行訓練!")
+    def go_back_single(self,event):
+        text = event.message.text
+        uid = event.source.user_id
+        for item in users:
+            if uid == item.uid:
+                if item.match == "Single":
+                    return True
+                else :
+                    return False
+    def go_back_double(self,event):
+        text = event.message.text
+        uid = event.source.user_id
+        for item in users:
+            if uid == item.uid:
+                if item.match == "Double":
+                    return True
+                else :
+                    return False
