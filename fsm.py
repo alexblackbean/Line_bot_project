@@ -1,10 +1,12 @@
 from transitions.extensions import GraphMachine
 
-from utils import send_text_message
-req_menu_double = 'Here comes the menu!\n1.小碎步(請輸入\na 獲得詳細資訊)\n2.壓迫性發球(致勝關鍵基本功,請輸入\nb 獲得詳細資訊)\n3.(Optinal)你想不想練擊球甜蜜點手感?(Yes or No)'
-req_menu_single = 'Here comes the menu!\n1.米字步(全場跑腳步的基本功,請輸入\na 獲得詳細資訊)\n2.短球、長球發球(發球基本功,請輸入\nb 獲得詳細資訊)\n3.(Optinal) 你想不想練反手擊球穩定度?(Yes or No)'
+from utils import push_image, push_message, send_image_url, send_text_message
+req_menu_double = 'Here comes the menu!\n1.小碎步(請輸入\na 獲得詳細資訊)\n2.壓迫性發球(致勝關鍵基本功,請輸入\nb 獲得詳細資訊)\n3.(Optinal)你想不想練擊球甜蜜點手感?(Yes or No)\n4.結束(end)'
+req_menu_single = 'Here comes the menu!\n1.米字步(全場跑腳步的基本功,請輸入\na 獲得詳細資訊)\n2.短球、長球發球(發球基本功,請輸入\nb 獲得詳細資訊)\n3.(Optinal) 你想不想練反手擊球穩定度?(Yes or No)\n4.結束(end)'
 users = []
-value = 0 #object
+ngrok_url = 'https://4377-123-194-8-218.ngrok.io'
+
+
 class TocMachine(GraphMachine):
     def __init__(self, **machine_configs):
         self.machine = GraphMachine(model=self, **machine_configs)
@@ -55,14 +57,14 @@ class TocMachine(GraphMachine):
         else:
             return False
     def Single_reply(self,event):
-        reply_token = event.reply_token
+        
         uid = event.source.user_id
         for item in users:
             if uid == item.uid:
                 if item.number == 1:
                     req = req_menu_single
                     break
-        send_text_message(reply_token,req)
+        push_message(req,uid)
     def is_Double(self,event):
         text = event.message.text
         uid = event.source.user_id
@@ -95,16 +97,18 @@ class TocMachine(GraphMachine):
                     item.AD = False
                     return False
     def AD(self,event):
-        reply_token = event.reply_token
         uid = event.source.user_id
         for item in users:
             if uid == item.uid:
                 if item.number == 1 and item.match == 'Single':
-                    req = '聽好喔~ 首先將球打高\n接著配合腳步移動對的位置\n最後抓時機打出長球或過渡球'
-                    send_text_message(reply_token,req+req_menu_single)
+                    req = '首先將球打到非慣用手方向之高處\n接著配合腳步移動對的位置\n最後抓時機打出長球或過渡球'
+                    push_message(req,uid)
                 elif item.number == 1 and item.match == "Double":
-                    req = 'send image'
-                    send_text_message(reply_token,req+req_menu_double)
+                    req = '把這個套子裝在你的羽球拍上讓擊球時有阻力(訓練咬球感)'
+                    img = 'https://i.imgur.com/izAK73o.jpg'
+                    push_image(img,uid)
+                    push_message(req,uid)
+                    
                 break
         self.go_back(event)
     def is_a(self,event):
@@ -115,16 +119,21 @@ class TocMachine(GraphMachine):
         else:
             return False
     def a_reply(self,event):
-        reply_token = event.reply_token
         uid = event.source.user_id
         for item in users:
             if uid == item.uid:
                 if item.number == 1 and item.match == "Single":
-                    req = 'send image of 6 point run'
-                    send_text_message(reply_token,req+req_menu_single)
+                    req = 'https://youtu.be/1d-NrsY99zk'
+                    img = "https://i.imgur.com/PZB9OGZ.jpg"
+                    push_message(req,uid)
+                    push_image(img,uid)
                 elif item.number == 1 and item.match == "Double":
-                    req = 'send image of small'
-                    send_text_message(reply_token,req+req_menu_double)
+                    req = 'https://youtu.be/xAUlx0eJ9eQ'
+                    push_message(req,uid)
+                elif item.number == 2 and item.match == "Single":
+                    None
+                elif item.number == 2 and item.match == "Double":
+                    None
                 break
         
         self.go_back(event)
@@ -141,13 +150,25 @@ class TocMachine(GraphMachine):
         for item in users:
             if uid == item.uid:
                 if item.number == 1 and item.match == "Single":
-                    req = 'send image of basic serve'
-                    send_text_message(reply_token,req+req_menu_single)
+                    img_1 = "https://i.imgur.com/JtvQ3NM.png"
+                    img_2 = "https://i.imgur.com/FBp7rIy.png"
+                    img_3 = "https://i.imgur.com/elBu1yg.png"
+                    push_image(img_1,uid)
+                    push_image(img_2,uid)
+                    push_image(img_3,uid)
                     break
                 elif item.number == 1 and item.match == "Double":
-                    req = 'send image of ad serve'
-                    send_text_message(reply_token,req+req_menu_double)
+                    img_1 = "https://i.imgur.com/CjUwcwS.png"
+                    img_2 = "https://i.imgur.com/6rHcRZc.jpg"
+                    img_3 = "https://i.imgur.com/pyutxV5.png"
+                    push_image(img_1,uid)
+                    push_image(img_2,uid)
+                    push_image(img_3,uid)
                     break
+                elif item.number == 2 and item.match == "Single":
+                    None
+                elif item.number == 2 and item.match == "Double":
+                    None
         
         self.go_back(event)
     def is_test(self,event):
@@ -173,3 +194,12 @@ class TocMachine(GraphMachine):
                     return True
                 else :
                     return False
+    def is_final(self,event):
+        text = event.message.text
+        if text.lower() == "end":
+            return True
+        else:
+            return False
+    def good_bye(self,event):
+        reply_token = event.reply_token
+        send_text_message(reply_token, "那就下次再使用吧~\n希望有幫助到你! (p.s. 輸入任意字串才次開始!)")

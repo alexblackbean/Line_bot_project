@@ -105,12 +105,21 @@ machine = TocMachine(
                     "source": ["a","b","AD"],
                     "dest": "Single",
                     "conditions": "go_back_single",
+                    "after": "Single_reply"
                 },
                 {
                     "trigger": "go_back",
                     "source": ["a","b","AD"],
                     "dest": "Double",
                     "conditions": "go_back_double",
+                    "after": "Double_reply"
+                },
+                {
+                    "trigger": "advance",
+                    "source": ["Single","Double"],
+                    "dest": "initial",
+                    "conditions": "is_final",
+                    "after": "good_bye"
                 }
 
             ],
@@ -262,12 +271,21 @@ def handle_message(event):
                     "source": ["a","b","AD"],
                     "dest": "Single",
                     "conditions": "go_back_single",
+                    "after": "Single_reply"
                 },
                 {
                     "trigger": "go_back",
                     "source": ["a","b","AD"],
                     "dest": "Double",
                     "conditions": "go_back_double",
+                    "after": "Double_reply"
+                },
+                {
+                    "trigger": "advance",
+                    "source": ["Single","Double"],
+                    "dest": "initial",
+                    "conditions": "is_final",
+                    "after": "good_bye"
                 }
 
             ],
