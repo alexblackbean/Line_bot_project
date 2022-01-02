@@ -12,7 +12,9 @@ Based on a finite state machine & basic Message reply, Image reply
 * pygraphviz==1.5
 * transitions==0.6.9
 * line-bot-sdk==1.14.0
-
+* graphviz
+* libgraphviz-dev
+* pkg-config
 ## Illustration
 * This app is used to help students know how to have a quickstart for
   their badminton basic trainning
