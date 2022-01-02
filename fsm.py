@@ -50,7 +50,7 @@ class TocMachine(GraphMachine):
     def is_Single(self,event):
         text = event.message.text
         uid = event.source.user_id
-        if text == "Single":
+        if text.lower() == "single":
             for item in users:
                 if uid == item.uid:
                     item.match = 'Single'
@@ -72,7 +72,7 @@ class TocMachine(GraphMachine):
     def is_Double(self,event):
         text = event.message.text
         uid = event.source.user_id
-        if text == "Double":
+        if text.lower() == "double":
             for item in users:
                 if uid == item.uid:
                     item.match = 'Double'
@@ -96,7 +96,7 @@ class TocMachine(GraphMachine):
         uid = event.source.user_id
         for item in users:
             if uid == item.uid:
-                if text == 'Yes':
+                if text.lower() == 'yes':
                     item.AD = True
                     return True
                 else :
@@ -125,7 +125,7 @@ class TocMachine(GraphMachine):
     def is_a(self,event):
         text = event.message.text
         uid = event.source.user_id
-        if text == "a":
+        if text.lower() == "a":
             return True
         else:
             return False
@@ -153,7 +153,7 @@ class TocMachine(GraphMachine):
     def is_b(self,event):
         text = event.message.text
         uid = event.source.user_id
-        if text == "b":
+        if text.lower() == "b":
             return True
         else:
             return False

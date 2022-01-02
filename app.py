@@ -165,7 +165,6 @@ def callback():
     except InvalidSignatureError:
         abort(400)
     # if event is MessageEvent and message is TextMessage, then echo text
-    # print(len(users))
     for event in events:
         user_id = event.source.user_id
         flag = False
@@ -175,20 +174,11 @@ def callback():
                 flag = True
                 temp = item.machine
                 break
-        # if not isinstance(event, MessageEvent):
-        #     continue
-        # if not isinstance(event.message, TextMessage):
-        #     continue
-        # if not isinstance(event.message.text, str):
-        #     continue
-        # print(f"\nFSM STATE: {machine.state}")
-        # print(f"REQUEST BODY: \n{body}")
         if flag == True:
             response = temp.advance(event)
             print(temp.state)
-            # print()
             if response == False:
-                send_text_message(event.reply_token, "Not Entering any State")
+                send_text_message(event.reply_token, "可能指令輸入錯了喔~~ 再輸入一次")
 
     return "OK"
 @handler.add(MessageEvent,message=TextMessage)
@@ -294,38 +284,6 @@ def handle_message(event):
             show_conditions=True,
         )
         fsm.users.append(new_user)
-        # print('user_id = ', user_id)
-
-# @app.route("/webhook", methods=["POST"])
-# def webhook_handler():
-#     signature = request.headers["X-Line-Signature"]
-#     # get request body as text
-#     body = request.get_data(as_text=True)
-#     app.logger.info(f"Request body: {body}")
-
-#     # parse webhook body
-#     try:
-#         events = parser.parse(body, signature)
-#     except InvalidSignatureError:
-#         abort(400)
-
-#     # if event is MessageEvent and message is TextMessage, then echo text
-#     for event in events:
-#         if not isinstance(event, MessageEvent):
-#             continue
-#         if not isinstance(event.message, TextMessage):
-#             continue
-#         if not isinstance(event.message.text, str):
-#             continue
-#         print(f"\nFSM STATE: {machine.state}")
-#         print(f"REQUEST BODY: \n{body}")
-#         response = machine.advance(event)
-#         machin
-#         if response == False:
-#             send_text_message(event.reply_token, "Not Entering any State")
-
-#     return "OK"
-
 
 @app.route("/show-fsm", methods=["GET"])
 def show_fsm():
