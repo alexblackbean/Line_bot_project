@@ -3,6 +3,8 @@ from transitions.extensions import GraphMachine
 from utils import push_image, push_message, send_image_url, send_text_message
 req_menu_double = 'Here comes the menu!\n1.小碎步(請輸入\na 獲得詳細資訊)\n2.壓迫性發球(致勝關鍵基本功,請輸入\nb 獲得詳細資訊)\n3.(Optinal)你想不想練擊球甜蜜點手感?(Yes or No)\n4.結束(end)'
 req_menu_single = 'Here comes the menu!\n1.米字步(全場跑腳步的基本功,請輸入\na 獲得詳細資訊)\n2.短球、長球發球(發球基本功,請輸入\nb 獲得詳細資訊)\n3.(Optinal) 你想不想練反手擊球穩定度?(Yes or No)\n4.結束(end)'
+req_menu_double_2 = 'Here comes the menu!\n1.平球互推(請輸入\na 獲得詳細資訊)\n2.殺球->接殺->平壓->起高->殺球 (請輸入\nb 獲得詳細資訊)\n3.(optional)若人數有3人以上，想不想練習比賽進攻?(Yes or No)\n4.結束(end)'
+req_menu_single_2 = 'Here comes the menu!\n1.切球->放短球->放短球->挑高->切球(請輸入\na 獲得詳細資訊)\n2.切球->放短球->挑球->切球 (請輸入\nb 獲得詳細資訊)\n3.(optional)練習斜向步伐?(Yes or No)\n4.結束(end)'
 users = []
 ngrok_url = 'https://4377-123-194-8-218.ngrok.io'
 
@@ -63,7 +65,9 @@ class TocMachine(GraphMachine):
             if uid == item.uid:
                 if item.number == 1:
                     req = req_menu_single
-                    break
+                else:
+                    req = req_menu_single_2
+                break
         push_message(req,uid)
     def is_Double(self,event):
         text = event.message.text
@@ -83,7 +87,9 @@ class TocMachine(GraphMachine):
             if uid == item.uid:
                 if item.number == 1:
                     req = req_menu_double
-                    break
+                else:
+                    req = req_menu_double_2
+                break
         send_text_message(reply_token,req)
     def is_AD(self,event):
         text = event.message.text
@@ -108,7 +114,12 @@ class TocMachine(GraphMachine):
                     img = 'https://i.imgur.com/izAK73o.jpg'
                     push_image(img,uid)
                     push_message(req,uid)
-                    
+                elif item.number == 2 and item.match == 'Single':
+                    img = 'https://i.imgur.com/fwPMAnq.png?1'
+                    push_image(img,uid)
+                elif item.number == 2 and item.match == 'Double':
+                    img = 'https://i.imgur.com/tvEiKoW.png?1'
+                    push_image(img,uid) 
                 break
         self.go_back(event)
     def is_a(self,event):
@@ -131,9 +142,11 @@ class TocMachine(GraphMachine):
                     req = 'https://youtu.be/xAUlx0eJ9eQ'
                     push_message(req,uid)
                 elif item.number == 2 and item.match == "Single":
-                    None
+                    img = "https://i.imgur.com/AnKfCc2.png?1"
+                    push_image(img,uid)
                 elif item.number == 2 and item.match == "Double":
-                    None
+                    img = "https://i.imgur.com/4Cn49uZ.png?1"
+                    push_image(img,uid)
                 break
         
         self.go_back(event)
@@ -156,7 +169,6 @@ class TocMachine(GraphMachine):
                     push_image(img_1,uid)
                     push_image(img_2,uid)
                     push_image(img_3,uid)
-                    break
                 elif item.number == 1 and item.match == "Double":
                     img_1 = "https://i.imgur.com/CjUwcwS.png"
                     img_2 = "https://i.imgur.com/6rHcRZc.jpg"
@@ -164,12 +176,13 @@ class TocMachine(GraphMachine):
                     push_image(img_1,uid)
                     push_image(img_2,uid)
                     push_image(img_3,uid)
-                    break
                 elif item.number == 2 and item.match == "Single":
-                    None
+                    img = "https://i.imgur.com/M63X62T.png?1"
+                    push_image(img,uid)
                 elif item.number == 2 and item.match == "Double":
-                    None
-        
+                    img = "https://i.imgur.com/7dDXuq5.png?1"
+                    push_image(img,uid)
+                break
         self.go_back(event)
     def is_test(self,event):
         return True
